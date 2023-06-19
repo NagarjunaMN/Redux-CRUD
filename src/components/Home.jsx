@@ -2,6 +2,8 @@ import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { readUser } from '../Action/UserAction'
 import { NavLink } from 'react-router-dom'
+import {toast} from 'react-toastify'
+import { deleteUser } from '../Action/UserAction'
 
 function Home() {
   const dispatch = useDispatch()
@@ -15,6 +17,21 @@ function Home() {
   },[])
 
   const users = useSelector((item) => item.myData.users)
+
+  //delete handler
+  const deleteHandler = async (id) => {
+    if(window.confirm(`Do you want to delete user id ${id} ?`)){
+      console.log("Delete id", id)
+      await dispatch(deleteUser({id}))
+      .unwrap()
+      .then(res => {
+        toast.success(`Uses data deleted`)
+        window.location.reload()
+      }).catch(err => toast.error(err.response.data.msg))
+    }else{
+      toast.warning(`Delete terminated`)
+    }
+  }
 
   return (
     <div className='container'>
@@ -38,7 +55,7 @@ function Home() {
                             <NavLink to={`/update/${item.id}`} className="btn btn-sm btn-info">
                                 <i className="bi bi-pencil"></i>
                             </NavLink>
-                            <button className="btn btn-sm btn-danger float-end">
+                            <button onClick={() => deleteHandler(item.id)} className="btn btn-sm btn-danger float-end">
                                 <i className="bi bi-trash"></i>
                             </button>
                         </div>
